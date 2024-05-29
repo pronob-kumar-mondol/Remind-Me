@@ -20,7 +20,7 @@ abstract class StudentDatabase:RoomDatabase() {
             INSTANCE ?: getDatabase(context).also { INSTANCE = it }
         }
 
-        private fun getDatabase(context: Context) = Room.databaseBuilder(
+        fun getDatabase(context: Context) = Room.databaseBuilder(
             context.applicationContext,
             StudentDatabase::class.java,
             "student_database.db"

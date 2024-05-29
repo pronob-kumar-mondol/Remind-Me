@@ -1,20 +1,40 @@
 package com.example.remindme
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var studentAdapter: StudentAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        val application = requireNotNull(this).application
+        val viewModel: StudentViewModel by viewModels {
+            StudentViewModelFactory(application)
         }
+
+        studentAdapter = StudentAdapter()
+        recyclerView.adapter = studentAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        viewModel.allStudents.observe(this, Observer { students ->
+            students?.let { studentAdapter.setStudents(it) }
+        })
+        fab.setOnClickListener {
+            val intent = Intent(this, AddStudentActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 }

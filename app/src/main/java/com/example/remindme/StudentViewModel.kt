@@ -1,25 +1,32 @@
-package com.example.remindme
+    package com.example.remindme
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
+    import android.app.Application
+    import androidx.lifecycle.AndroidViewModel
+    import androidx.lifecycle.LiveData
+    import androidx.lifecycle.ViewModel
+    import androidx.lifecycle.viewModelScope
+    import kotlinx.coroutines.launch
 
-class StudentViewModel(
-    private val studentRepository: StudentRepository
-):ViewModel() {
+    class StudentViewModel(application: Application) : AndroidViewModel(application) {
 
-    val allStudents:LiveData<List<StudentEntity>> = studentRepository.allStudents
+        private val repository: StudentRepository
+        val allStudents: LiveData<List<StudentEntity>>
 
-    fun insert(student: StudentEntity) = viewModelScope.launch {
-        studentRepository.insert(student)
+        init {
+            val studentDao = StudentDatabase.getDatabase(application).studentDao()
+            repository = StudentRepository(studentDao)
+            allStudents = repository.allStudents
+        }
+
+        fun insert(student: StudentEntity) = viewModelScope.launch {
+            repository.insert(student)
+        }
+
+        fun update(student: StudentEntity) = viewModelScope.launch {
+            repository.update(student)
+        }
+
+        fun delete(student: StudentEntity) = viewModelScope.launch {
+            repository.delete(student)
+        }
     }
-
-    fun update(student: StudentEntity) = viewModelScope.launch {
-        studentRepository.update(student)
-    }
-
-    fun delete(student: StudentEntity) = viewModelScope.launch {
-        studentRepository.delete(student)
-    }
-}
